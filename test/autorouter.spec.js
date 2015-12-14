@@ -7,9 +7,6 @@
 // Tests
 describe('AutoRouter', function () {
     'use strict';
-    var global = {};
-    global.WebGMEGlobal = {};
-
     var srcPath = __dirname + '/../src/',
         utils = require('./AutoRouter/autorouter.common'),
         assert = require('assert'),
@@ -24,44 +21,46 @@ describe('AutoRouter', function () {
     var replayTests = function () {
 
         beforeEach(function() {
+            bugPlayer = new ARBugPlayer();
             bugPlayer.expectedErrors = [];
         });
 
         it('basic model with ports', function (done) {
             var actions = require('./AutoRouter/testCases/basic.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
-        it.skip('bug report 1', function (done) {
+        it('bug report 1', function (done) {
             var actions = require('./AutoRouter/testCases/AR_bug_report1422640675165.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
         // Changed CR3
-        it.skip('bug report 2', function (done) {
+        it('bug report 2', function (done) {
             var actions = require('./AutoRouter/testCases/AR_bug_report_2.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
 
         });
 
-        it.skip('bug report 3', function (done) {
+        it('bug report 3', function (done) {
             var actions = require('./AutoRouter/testCases/AR_bug_report1422974690643.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
-        it.skip('bug report 4', function (done) {
+        it('bug report 4', function (done) {
             var actions = require('./AutoRouter/testCases/AR_bug_report1423074120283.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
-        it.skip('bug report 5', function (done) {
+        it('bug report 5', function (done) {
+            this.timeout(4000);  // This one is very large
             var actions = require('./AutoRouter/testCases/AR_bug_report1423077073008.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
-        it.skip('bug report 6', function (done) {
+        it('bug report 6', function (done) {
             var actions = require('./AutoRouter/testCases/AR_bug_report1423157583206.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
         it('issue/153_overlapping_lines', function (done) {
@@ -80,7 +79,7 @@ describe('AutoRouter', function () {
                     }
                 };
 
-            bugPlayer.test(JSON.parse(actions), {}, function() {
+            bugPlayer.test(actions, function() {
                 // Check that the paths are not overlapping
                 bugPlayer.getPathPoints(pathIds[1], function(points) {
                     storeFirstPt(points);
@@ -91,12 +90,12 @@ describe('AutoRouter', function () {
 
         it('issue/169_autorouter_section_HasBlockedEdge_assert_failure', function (done) {
             var actions = require('./AutoRouter/testCases/issue169.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
         it('issue/186_cannot_read_property_id_of_undefined', function (done) {
             var actions = require('./AutoRouter/testCases/issue186.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
         it('issue/187_short_path_should_be_a_straight_line', function (done) {
@@ -105,7 +104,7 @@ describe('AutoRouter', function () {
             var startpoint,
                 endpoint;
 
-            bugPlayer.test(JSON.parse(actions), {}, function() {
+            bugPlayer.test(actions, function() {
                 bugPlayer.getPathPoints('C_000003', function(points) {
                     startpoint = points.shift();
                     endpoint = points.pop();
@@ -120,27 +119,27 @@ describe('AutoRouter', function () {
 
         it('issue/190_box_size_too_small', function (done) {
             var actions = require('./AutoRouter/testCases/issue190.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
         it('issue/288_double_click_on_connection', function (done) {
             var actions = require('./AutoRouter/testCases/issue288.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
         it('creating extra connection segments', function (done) {
             var actions = require('./AutoRouter/testCases/creating_new_custom_points.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
         it('creating extra connection segments (2)', function (done) {
             var actions = require('./AutoRouter/testCases/custom_points2.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
         it('issue/297_custom_points_port_selection', function (done) {
             var actions = require('./AutoRouter/testCases/issue297.json');
-            bugPlayer.test(JSON.parse(actions), {}, function() {
+            bugPlayer.test(actions, function() {
                 // Check that both boxes are connected on their
                 // left side (as it is closest to their next next
                 // point on the custom path)
@@ -162,18 +161,19 @@ describe('AutoRouter', function () {
 
         it('issue/404_setStartPointPrev_is_not_a_function', function (done) {
             var actions = require('./AutoRouter/testCases/issue404.json');
-            bugPlayer.test(JSON.parse(actions));
+            bugPlayer.test(actions, done);
         });
 
         it('should not move box that doesn\'t exist', function (done) {
             //this.timeout(30000);  // Too slow with web worker on my dev box
             var actions = require('./AutoRouter/testCases/finding_correct_buffer_box.json');
             bugPlayer.expectedErrors.push(/Box does not exist/);
+            bugPlayer.test(actions, done);
         });
 
         it('should not contain skew edge w/ async routing', function (done) {
             var actions = require('./AutoRouter/testCases/simplifyPathsbug.json');
-            bugPlayer.test(JSON.parse(actions), {}, function() {
+            bugPlayer.test(actions, function() {
                 bugPlayer.getPathPoints('C_000032', function(/*points*/) {
                     // TODO: Add API for executing stuff after routeAsync is done...
                     // utils.validatePoints(points);
@@ -184,9 +184,9 @@ describe('AutoRouter', function () {
 
         it('issue/447_autorouter_cant_retrieve_end_port', function (done) {
             var actions = require('./AutoRouter/testCases/issue447.json');
-            bugPlayer.test(JSON.parse(actions), {}, function() {
+            bugPlayer.test(actions, {}, function() {
                 // Check that paths are routed
-                setTimeout(done,200);
+                setTimeout(done, 200);
             });
         });
     };
@@ -940,16 +940,16 @@ describe('AutoRouter', function () {
             describe('Tests', replayTests);
         });
 
-        describe('Web Worker', function () {
-            // Set up the Autorouter as a web worker
-            before(function() {
-                bugPlayer.useWebWorker(true);
-            });
-            describe('Tests', replayTests);
-            after(function() {
-                bugPlayer.teardown();
-            });
-        });
+        //describe.skip('Web Worker', function () {
+            //// Set up the Autorouter as a web worker
+            //before(function() {
+                //bugPlayer.useWebWorker(true);
+            //});
+            //describe('Tests', replayTests);
+            //after(function() {
+                //bugPlayer.teardown();
+            //});
+        //});
     });
 
     describe('Utility Fn tests', function () {

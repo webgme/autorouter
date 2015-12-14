@@ -1,7 +1,7 @@
 {
   "name": "autorouter",
   "version": "1.0.0",
-  "description": "A library for finding intelligent routing in visual diagramming tools",
+  "description": "A library for intelligent routing in visual diagramming tools",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -16,6 +16,7 @@
     "lodash.assign": "^3.2.0"
   },
   "devDependencies": {
-    "mocha": "^2.3.4"
+    "mocha": "^2.3.4",
+    "webworker-threads": "^0.6.2"
   }
 }

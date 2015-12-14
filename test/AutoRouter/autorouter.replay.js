@@ -6,10 +6,12 @@
 'use strict';
 var srcPath = __dirname + '/../../src/',
     ActionApplier = require(srcPath + 'AutoRouter.ActionApplier'),
+    nop = require(srcPath + 'AutoRouter.Utils').nop,
     extend = require('lodash.assign'),
     assert = require('assert'),
     verbose,
-    HEADER = 'AUTOROUTER REPLAYER:\t';
+    HEADER = 'AUTOROUTER REPLAYER:\t',
+    Worker = require('webworker-threads').Worker;
 
 var AutoRouterBugPlayer = function () {
     this.logger = {error: console.log};
@@ -43,14 +45,17 @@ AutoRouterBugPlayer.prototype.testLocal = function (actions, options, callback) 
 
         i;
 
+    if (arguments.length < 3) {
+        callback = options;
+    }
+
     // Unpack the options
     this.init();
     options = options || {};
     verbose = options.verbose || false;
-    before = options.before || function () {
-    };
-    after = options.after || function () {
-    };
+    before = options.before || nop;
+    after = options.after || nop;
+    callback = callback || nop;
     last = options.actionCount || actions.length;
 
     // Run the tests
@@ -67,9 +72,7 @@ AutoRouterBugPlayer.prototype.testLocal = function (actions, options, callback) 
         after(this.autorouter);
     }
 
-    if (callback) {
-        callback();
-    }
+    callback();
 };
 
 // Web worker functionality
@@ -90,7 +93,7 @@ AutoRouterBugPlayer.prototype.useWebWorker = function (usingWebWorker) {
 
 // FIXME: Test the web worker
 AutoRouterBugPlayer.prototype._createWebWorker = function (callback) {
-    var workerFile = '/base/src/client/js/Widgets/DiagramDesigner/AutoRouter.Worker.js';
+    var workerFile = srcPath + 'AutoRouter.Worker.js';
     assert(!!Worker, 'Web Workers are not supported in your environment');
 
     this.log('Creating web worker');
