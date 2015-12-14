@@ -7,12 +7,15 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node ./node_modules/mocha/bin/mocha --recursive test"
   },
   "author": "Brian Broll",
   "license": "MIT",
   "dependencies": {
     "debug": "^2.2.0",
     "lodash.assign": "^3.2.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4"
   }
 }
