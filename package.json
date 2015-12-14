@@ -1,0 +1,18 @@
+{
+  "name": "autorouter",
+  "version": "1.0.0",
+  "description": "A library for finding intelligent routing in visual diagramming tools",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Brian Broll",
+  "license": "MIT",
+  "dependencies": {
+    "debug": "^2.2.0",
+    "lodash.assign": "^3.2.0"
+  }
+}
