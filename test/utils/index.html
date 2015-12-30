@@ -1,0 +1,30 @@
+<html>
+    <body>
+        <select id="testcases">
+        </select>
+        <div id="graph" style="top:50px">
+        </div>
+    </body>
+    <script type="text/javascript" charset="utf-8" src="replayer.js"></script>
+    <script type="text/javascript" charset="utf-8" src="raphael.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="test-viewer.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        var viewer = new TestViewer(document.getElementById('graph'));
+
+        // Create the list of test cases
+        var dropdown = document.getElementById('testcases');
+        dropdown.onchange = function() {
+            var testcase = this.value;
+            if (testcase) {
+                getTestCase(testcase, viewer.render.bind(viewer));
+            }
+        };
+        getTestCases(function(cases) {
+            cases.forEach(testcase => {
+                var opt = document.createElement('option');
+                opt.innerHTML = testcase;
+                dropdown.appendChild(opt);
+            });
+        });
+    </script>
+</html>

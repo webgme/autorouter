@@ -8,12 +8,13 @@
 describe('AutoRouter', function () {
     'use strict';
     var srcPath = __dirname + '/../src/',
-        utils = require('./AutoRouter/autorouter.common'),
+        utils = require('./utils/autorouter.common'),
         assert = require('assert'),
         router,
         gmeConfig,
-        ARBugPlayer = require('./AutoRouter/autorouter.replay'),
+        ARBugPlayer = require('./utils/autorouter.replay'),
         boxUtils = utils.webgme,
+        DEBUG = {verbose: true},
         bugPlayer = new ARBugPlayer();
 
     //this.timeout(20000);
@@ -26,46 +27,46 @@ describe('AutoRouter', function () {
         });
 
         it('basic model with ports', function (done) {
-            var actions = require('./AutoRouter/testCases/basic.json');
+            var actions = require('./test-cases/basic.json');
             bugPlayer.test(actions, done);
         });
 
         it('bug report 1', function (done) {
-            var actions = require('./AutoRouter/testCases/AR_bug_report1422640675165.json');
+            var actions = require('./test-cases/AR_bug_report1422640675165.json');
             bugPlayer.test(actions, done);
         });
 
         // Changed CR3
         it('bug report 2', function (done) {
-            var actions = require('./AutoRouter/testCases/AR_bug_report_2.json');
+            var actions = require('./test-cases/AR_bug_report_2.json');
             bugPlayer.test(actions, done);
 
         });
 
         it('bug report 3', function (done) {
-            var actions = require('./AutoRouter/testCases/AR_bug_report1422974690643.json');
+            var actions = require('./test-cases/AR_bug_report1422974690643.json');
             bugPlayer.test(actions, done);
         });
 
         it('bug report 4', function (done) {
-            var actions = require('./AutoRouter/testCases/AR_bug_report1423074120283.json');
+            var actions = require('./test-cases/AR_bug_report1423074120283.json');
             bugPlayer.test(actions, done);
         });
 
         it('bug report 5', function (done) {
             this.timeout(4000);  // This one is very large
-            var actions = require('./AutoRouter/testCases/AR_bug_report1423077073008.json');
+            var actions = require('./test-cases/AR_bug_report1423077073008.json');
             bugPlayer.test(actions, done);
         });
 
         it('bug report 6', function (done) {
-            var actions = require('./AutoRouter/testCases/AR_bug_report1423157583206.json');
+            var actions = require('./test-cases/AR_bug_report1423157583206.json');
             bugPlayer.test(actions, done);
         });
 
         it('issue/153_overlapping_lines', function (done) {
             // Connection 4 and 6 are about stacked
-            var actions = require('./AutoRouter/testCases/issue153.json'),
+            var actions = require('./test-cases/issue153.json'),
                 pathIds = ['C_000006', 'C_000004'],
                 startpoints = [],
                 storeFirstPt = function(points) {
@@ -89,17 +90,17 @@ describe('AutoRouter', function () {
         });
 
         it('issue/169_autorouter_section_HasBlockedEdge_assert_failure', function (done) {
-            var actions = require('./AutoRouter/testCases/issue169.json');
+            var actions = require('./test-cases/issue169.json');
             bugPlayer.test(actions, done);
         });
 
         it('issue/186_cannot_read_property_id_of_undefined', function (done) {
-            var actions = require('./AutoRouter/testCases/issue186.json');
+            var actions = require('./test-cases/issue186.json');
             bugPlayer.test(actions, done);
         });
 
         it('issue/187_short_path_should_be_a_straight_line', function (done) {
-            var actions = require('./AutoRouter/testCases/issue187.json');
+            var actions = require('./test-cases/issue187.json');
 
             var startpoint,
                 endpoint;
@@ -118,27 +119,27 @@ describe('AutoRouter', function () {
         });
 
         it('issue/190_box_size_too_small', function (done) {
-            var actions = require('./AutoRouter/testCases/issue190.json');
+            var actions = require('./test-cases/issue190.json');
             bugPlayer.test(actions, done);
         });
 
         it('issue/288_double_click_on_connection', function (done) {
-            var actions = require('./AutoRouter/testCases/issue288.json');
+            var actions = require('./test-cases/issue288.json');
             bugPlayer.test(actions, done);
         });
 
         it('creating extra connection segments', function (done) {
-            var actions = require('./AutoRouter/testCases/creating_new_custom_points.json');
+            var actions = require('./test-cases/creating_new_custom_points.json');
             bugPlayer.test(actions, done);
         });
 
         it('creating extra connection segments (2)', function (done) {
-            var actions = require('./AutoRouter/testCases/custom_points2.json');
+            var actions = require('./test-cases/custom_points2.json');
             bugPlayer.test(actions, done);
         });
 
         it('issue/297_custom_points_port_selection', function (done) {
-            var actions = require('./AutoRouter/testCases/issue297.json');
+            var actions = require('./test-cases/issue297.json');
             bugPlayer.test(actions, function() {
                 // Check that both boxes are connected on their
                 // left side (as it is closest to their next next
@@ -160,19 +161,19 @@ describe('AutoRouter', function () {
         });
 
         it('issue/404_setStartPointPrev_is_not_a_function', function (done) {
-            var actions = require('./AutoRouter/testCases/issue404.json');
+            var actions = require('./test-cases/issue404.json');
             bugPlayer.test(actions, done);
         });
 
         it('should not move box that doesn\'t exist', function (done) {
             //this.timeout(30000);  // Too slow with web worker on my dev box
-            var actions = require('./AutoRouter/testCases/finding_correct_buffer_box.json');
+            var actions = require('./test-cases/finding_correct_buffer_box.json');
             bugPlayer.expectedErrors.push(/Box does not exist/);
             bugPlayer.test(actions, done);
         });
 
         it('should not contain skew edge w/ async routing', function (done) {
-            var actions = require('./AutoRouter/testCases/simplifyPathsbug.json');
+            var actions = require('./test-cases/simplifyPathsbug.json');
             bugPlayer.test(actions, function() {
                 bugPlayer.getPathPoints('C_000032', function(/*points*/) {
                     // TODO: Add API for executing stuff after routeAsync is done...
@@ -183,11 +184,16 @@ describe('AutoRouter', function () {
         });
 
         it('issue/447_autorouter_cant_retrieve_end_port', function (done) {
-            var actions = require('./AutoRouter/testCases/issue447.json');
-            bugPlayer.test(actions, {}, function() {
+            var actions = require('./test-cases/issue447.json');
+            bugPlayer.test(actions, function() {
                 // Check that paths are routed
                 setTimeout(done, 200);
             });
+        });
+
+        it.skip('issue/port-not-removed', function (done) {
+            var actions = require('./test-cases/port-not-removed.json');
+            bugPlayer.test(actions, done);
         });
     };
 

@@ -7,10 +7,17 @@
     "test": "test"
   },
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha --recursive test",
+    "pretest": "npm run build-actionapplier && npm run build-replayer",
+    "build-replayer": "node node_modules/browserify/bin/cmd.js test/utils/autorouter.replay.js -d --s AutoRouterReplayer > test/build/replayer.js",
+    "build-viewer": "node node_modules/browserify/bin/cmd.js test/utils/test-viewer.js -d --s TestViewer > test/build/test-viewer.js",
+    "build-actionapplier": "node node_modules/browserify/bin/cmd.js src/AutoRouter.ActionApplier.js -d --s AutoRouterActionApplier > dist/action-applier.js",
+    "build-actionapplier-min": "node node_modules/browserify/bin/cmd.js src/AutoRouter.ActionApplier.js -d --s AutoRouterActionApplier | node node_modules/uglify-js//bin/uglifyjs -c > dist/action-applier.min.js",
+
+    "test": "node ./node_modules/mocha/bin/mocha $(find test/ | grep spec.js)",
     "build-debug": "node node_modules/browserify/bin/cmd.js index.js -d --s AutoRouter > dist/autorouter.js",
     "build-min": "node_modules/browserify/bin/cmd.js index.js -d --s AutoRouter | node node_modules/uglify-js/bin/uglifyjs -c > dist/autorouter.min.js",
-    "build": "npm run build-debug && npm run build-min"
+    "build": "npm run build-debug && npm run build-min",
+    "test-viewer": "node test/utils/test-server.js"
   },
   "author": "Brian Broll",
   "license": "MIT",
@@ -21,6 +28,8 @@
   "devDependencies": {
     "browserify": "^12.0.1",
     "mocha": "^2.3.4",
+    "express": "^4.13.3",
+    "raphael": "^2.1.4",
     "uglify-js": "^2.6.1",
     "webworker-threads": "^0.6.2"
   }

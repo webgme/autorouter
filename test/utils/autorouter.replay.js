@@ -4,16 +4,17 @@
  */
 
 'use strict';
-var srcPath = __dirname + '/../../src/',
-    ActionApplier = require(srcPath + 'AutoRouter.ActionApplier'),
-    nop = require(srcPath + 'AutoRouter.Utils').nop,
+
+var srcPath = './../../src/',
+    ActionApplier = require('./../../src/AutoRouter.ActionApplier'),
+    nop = function(){},
     extend = require('lodash.assign'),
     assert = require('assert'),
     verbose,
     HEADER = 'AUTOROUTER REPLAYER:\t',
-    Worker = require('webworker-threads').Worker;
+    Worker /*= require('webworker-threads').Worker*/;
 
-var AutoRouterBugPlayer = function () {
+var AutoRouterReplayer = function () {
     this.logger = {error: console.log};
 
     // Web worker support
@@ -25,7 +26,7 @@ var AutoRouterBugPlayer = function () {
     this._count = null;
 };
 
-AutoRouterBugPlayer.prototype.log = function () {
+AutoRouterReplayer.prototype.log = function () {
     var msg,
         i;
 
@@ -38,7 +39,7 @@ AutoRouterBugPlayer.prototype.log = function () {
     }
 };
 
-AutoRouterBugPlayer.prototype.testLocal = function (actions, options, callback) {
+AutoRouterReplayer.prototype.testLocal = function (actions, options, callback) {
     var before,
         after,
         last,
@@ -77,22 +78,22 @@ AutoRouterBugPlayer.prototype.testLocal = function (actions, options, callback) 
 
 // Web worker functionality
 /**
- * Set the AutoRouterBugPlayer to use a web worker or not.
+ * Set the AutoRouterReplayer to use a web worker or not.
  *
  * @param {Boolean} [usingWebWorker]
  * @return {undefined}
  */
-AutoRouterBugPlayer.prototype.useWebWorker = function (usingWebWorker) {
+AutoRouterReplayer.prototype.useWebWorker = function (usingWebWorker) {
     if (usingWebWorker) {  // Enable web worker
-        this.test = AutoRouterBugPlayer.prototype.testWithWebWorker;
+        this.test = AutoRouterReplayer.prototype.testWithWebWorker;
     } else {
-        this.test = AutoRouterBugPlayer.prototype.testLocal;
+        this.test = AutoRouterReplayer.prototype.testLocal;
     }
     this.usingWebWorker = usingWebWorker;
 };
 
 // FIXME: Test the web worker
-AutoRouterBugPlayer.prototype._createWebWorker = function (callback) {
+AutoRouterReplayer.prototype._createWebWorker = function (callback) {
     var workerFile = srcPath + 'AutoRouter.Worker.js';
     assert(!!Worker, 'Web Workers are not supported in your environment');
 
@@ -117,14 +118,14 @@ AutoRouterBugPlayer.prototype._createWebWorker = function (callback) {
  *
  * @return {undefined}
  */
-AutoRouterBugPlayer.prototype.teardown = function () {
+AutoRouterReplayer.prototype.teardown = function () {
     if (this._worker) {
         this._worker.terminate();
         this._worker = null;
     }
 };
 
-AutoRouterBugPlayer.prototype.testWithWebWorker = function (actions, options, callback) {
+AutoRouterReplayer.prototype.testWithWebWorker = function (actions, options, callback) {
     var last;
 
     options = options || {};
@@ -139,7 +140,7 @@ AutoRouterBugPlayer.prototype.testWithWebWorker = function (actions, options, ca
     this.onFinished = callback;
 };
 
-AutoRouterBugPlayer.prototype._onWorkerMessage = function (data) {
+AutoRouterReplayer.prototype._onWorkerMessage = function (data) {
     var response = data.data;
     this.log('Web worker responded:'+response);
     if (typeof response[2] === 'string' && response[2].indexOf('Error') === 0) {
@@ -157,7 +158,7 @@ AutoRouterBugPlayer.prototype._onWorkerMessage = function (data) {
     }
 };
 
-AutoRouterBugPlayer.prototype._isExpectedError = function (error) {
+AutoRouterReplayer.prototype._isExpectedError = function (error) {
     for (var i = this.expectedErrors.length; i--;) {
         if (this.expectedErrors[i].test(error)) {
             this.expectedErrors.splice(i,1);
@@ -167,14 +168,14 @@ AutoRouterBugPlayer.prototype._isExpectedError = function (error) {
     return false;
 };
 
-AutoRouterBugPlayer.prototype._callNext = function () {
+AutoRouterReplayer.prototype._callNext = function () {
     var task = this._queue.shift();
     this.log('Calling Action #' + this._count + ':', task.action, 'with', task.args);
     this._worker.postMessage([task.action, task.args]);
 };
 
 /* * * * * * * * Querying the AutoRouter * * * * * * * */
-AutoRouterBugPlayer.prototype.getPathPoints = function (pathId, callback) {
+AutoRouterReplayer.prototype.getPathPoints = function (pathId, callback) {
     if (this.usingWebWorker) {  // Enable web worker
         this._worker.onmessage = function(data) {
             if (data.data[0] === 'getPathPoints' && pathId === data.data[1][0]) {
@@ -188,7 +189,7 @@ AutoRouterBugPlayer.prototype.getPathPoints = function (pathId, callback) {
     }
 };
 
-AutoRouterBugPlayer.prototype.getBoxRect = function (boxId, callback) {
+AutoRouterReplayer.prototype.getBoxRect = function (boxId, callback) {
     if (this.usingWebWorker) {  // Enable web worker
         this._worker.onmessage = function(data) {
             if (data.data[0] === 'getBoxRect' && boxId === data.data[1][0]) {
@@ -202,6 +203,6 @@ AutoRouterBugPlayer.prototype.getBoxRect = function (boxId, callback) {
     }
 };
 
-extend(AutoRouterBugPlayer.prototype, ActionApplier.prototype);
+extend(AutoRouterReplayer.prototype, ActionApplier.prototype);
 
-module.exports = AutoRouterBugPlayer;
+module.exports = AutoRouterReplayer;

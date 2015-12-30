@@ -6,11 +6,12 @@
 'use strict';
 
 var AutoRouter = require('./AutoRouter'),
-    assert = require('assert');
-
+    assert = require('./AutoRouter.Utils').assert;
 
 var AutoRouterActionApplier = function () {
 };
+
+AutoRouterActionApplier.AutoRouter = AutoRouter;
 
 AutoRouterActionApplier.prototype.init = function () {
     this._portSeparator = this._portSeparator || '_x_';

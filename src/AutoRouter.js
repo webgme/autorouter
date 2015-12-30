@@ -507,6 +507,7 @@ AutoRouter.prototype.updatePort = function (boxObject, portInfo) {
         outgoingPaths = this.portId2Path[portId].out,
         newPort;
 
+    // FIXME: this should be done better
     this._changePortId(portId, tmpId);
     newPort = this.addPort(boxObject, portInfo);
 
