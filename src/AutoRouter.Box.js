@@ -50,6 +50,7 @@ AutoRouterBox.prototype.hasOwner = function () {
     return this.owner !== null;
 };
 
+// TODO: Remove this function
 AutoRouterBox.prototype.createPort = function () {
     var port = new AutoRouterPort();
     assert(port !== null, 'ARBox.createPort: port !== null FAILED');
@@ -111,9 +112,6 @@ AutoRouterBox.prototype.setRect = function (r) {
     assert(r.getBottomRight().x <= CONSTANTS.ED_MAXCOORD && r.getBottomRight().y <= CONSTANTS.ED_MAXCOORD,
         'ARBox.setRect:  r.getBottomRight().x <= CONSTANTS.ED_MAXCOORD && r.getBottomRight().y <= ' +
         'CONSTANTS.ED_MAXCOORD FAILED!');
-
-    assert(this.ports.length === 0 || this.atomic,
-        'ARBox.setRect: this.ports.length === 0 || this.atomic FAILED!');
 
     this.rect.assign(r);
     this.calculateSelfPoints();
