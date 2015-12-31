@@ -16,7 +16,7 @@
     "test": "node ./node_modules/mocha/bin/mocha $(find test/ | grep spec.js)",
     "build-debug": "node node_modules/browserify/bin/cmd.js index.js -d --s AutoRouter > dist/autorouter.js",
     "build-min": "node_modules/browserify/bin/cmd.js index.js -d --s AutoRouter | node node_modules/uglify-js/bin/uglifyjs -c > dist/autorouter.min.js",
-    "build": "npm run build-debug && npm run build-min",
+    "build": "npm run build-debug && npm run build-min && npm run build-actionapplier && npm run build-actionapplier-min",
     "test-viewer": "node test/utils/test-server.js"
   },
   "author": "Brian Broll",
