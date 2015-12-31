@@ -7,9 +7,9 @@
 
 'use strict';
 
-var assert = require('assert'),
-    CONSTANTS = require('./AutoRouter.Constants'),
+var CONSTANTS = require('./AutoRouter.Constants'),
     Utils = require('./AutoRouter.Utils'),
+    assert = Utils.assert,
     ArPoint = require('./AutoRouter.Point'),
     ArRect = require('./AutoRouter.Rect'),
     AutoRouterGraph = require('./AutoRouter.Graph'),
@@ -507,6 +507,7 @@ AutoRouter.prototype.updatePort = function (boxObject, portInfo) {
         outgoingPaths = this.portId2Path[portId].out,
         newPort;
 
+    // FIXME: this should be done better
     this._changePortId(portId, tmpId);
     newPort = this.addPort(boxObject, portInfo);
 

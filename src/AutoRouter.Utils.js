@@ -8,7 +8,7 @@
 'use strict';
 
 var CONSTANTS = require('./AutoRouter.Constants'),
-    assert = require('assert'),
+    assert = require('./AutoRouter.Utils').assert,
     ArRect = require('./AutoRouter.Rect'),
     ArPoint = require('./AutoRouter.Point');
 
@@ -860,6 +860,12 @@ var nop = function() {
     // nop
 };
 
+var assert = function(cond, msg) {
+    if (!cond) {
+        throw new Error(msg || 'Assert failed');
+    }
+};
+
 module.exports = {
     onWhichEdge: _onWhichEdge,
     isCoordInDirFrom: _isCoordInDirFrom,
@@ -903,5 +909,6 @@ module.exports = {
     roundTrunc: roundTrunc,
     toArray: toArray,
     nop: nop,
+    assert: assert,
     pick: pick 
 };

@@ -8,9 +8,9 @@
 'use strict';
 
 var Logger = require('./AutoRouter.Logger'),  // FIXME
-    assert = require('assert'),
     CONSTANTS = require('./AutoRouter.Constants'),
     Utils = require('./AutoRouter.Utils'),
+    assert = Utils.assert,
     ArPoint = require('./AutoRouter.Point'),
     ArPointListPath = require('./AutoRouter.PointList'),
     ArRect = require('./AutoRouter.Rect'),

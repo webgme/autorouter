@@ -1,9 +1,11 @@
 <html>
     <body>
-        Is the min AutoRouter loaded? <span id="label"></span>
+        Is the min AutoRouterActionApplier loaded? <span id="actionapplier"></span> <br>
+        Is the min AutoRouter loaded? <span id="autorouter"></span>
     </body>
-    <script type="text/javascript" charset="utf-8" src="../dist/autorouter.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../dist/action-applier.min.js"></script>
     <script type="text/javascript" charset="utf-8">
-        document.getElementById('label').innerHTML = (typeof AutoRouter !== 'undefined' ? 'yes' : 'no');
+        document.getElementById('actionapplier').innerHTML = (typeof AutoRouterActionApplier !== 'undefined' ? 'yes' : 'no');
+        document.getElementById('autorouter').innerHTML = (typeof AutoRouterActionApplier.AutoRouter !== 'undefined' ? 'yes' : 'no');
     </script>
 </html>
