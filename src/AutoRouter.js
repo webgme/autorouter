@@ -1,5 +1,5 @@
 /*globals define*/
-/*jshint browser: true, esnext: true*/
+/*jshint browser: true*/
 
 /**
  * @author brollb / https://github/brollb
@@ -245,15 +245,15 @@ AutoRouter.prototype._createPath = function (id, srcId, dstId) {  // public id
         srcPorts = [],
         dstPorts = [],
         containerId,
-        path;
+        path,
+        i;
 
-    // FIXME: This isn't good enough for ports
-    for (let i = srcContainerIds.length; i--;) {
+    for (i = srcContainerIds.length; i--;) {
         containerId = srcContainerIds[i];
         srcPorts = srcPorts.concat(this._box[srcId][containerId].ports);
     }
 
-    for (let i = dstContainerIds.length; i--;) {
+    for (i = dstContainerIds.length; i--;) {
         containerId = dstContainerIds[i];
         dstPorts = dstPorts.concat(this._box[dstId][containerId].ports);
     }

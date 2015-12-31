@@ -46,6 +46,7 @@ AutoRouterActionApplier.prototype._lookupItem = function (dictionary, array, ind
     }
 };
 
+// FIXME: Update this method for new api
 AutoRouterActionApplier.prototype._fixArgs = function (command, args) {
     var id;
     // Fix args, if needed
