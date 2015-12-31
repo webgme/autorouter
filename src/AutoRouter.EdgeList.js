@@ -8,9 +8,9 @@
 'use strict';
 
 var Logger = require('./AutoRouter.Logger'),
-    assert = require('assert'),
     CONSTANTS = require('./AutoRouter.Constants'),
     Utils = require('./AutoRouter.Utils'),
+    assert = Utils.assert,
     AutoRouterPath = require('./AutoRouter.Path'),
     AutoRouterPort = require('./AutoRouter.Port'),
     AutoRouterBox = require('./AutoRouter.Box'),

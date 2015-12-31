@@ -8,7 +8,7 @@
 'use strict';
 
 var CONSTANTS = require('./AutoRouter.Constants'),
-    assert = require('assert'),
+    assert = require('./AutoRouter.Utils').assert,
     ArRect = require('./AutoRouter.Rect'),
     ArPoint = require('./AutoRouter.Point');
 
