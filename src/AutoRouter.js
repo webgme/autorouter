@@ -8,15 +8,11 @@
 'use strict';
 
 var CONSTANTS = require('./AutoRouter.Constants'),
-    Utils = require('./AutoRouter.Utils'),
-    assert = Utils.assert,
+    assert = require('./AutoRouter.Utils').assert,
     ArPoint = require('./AutoRouter.Point'),
     ArRect = require('./AutoRouter.Rect'),
     AutoRouterGraph = require('./AutoRouter.Graph'),
-    AutoRouterBox = require('./AutoRouter.Box'),
-    AutoRouterPort = require('./AutoRouter.Port'),
-    AutoRouterRect = require('./AutoRouter.Rect'),
-    AutoRouterPath = require('./AutoRouter.Path');
+    AutoRouterPort = require('./AutoRouter.Port');
 
 var AutoRouter = function () {
     // internal to external ids
@@ -295,7 +291,7 @@ AutoRouter.prototype._setCustomPath = function (path, points) {  // public id
 AutoRouter.prototype._createPort = function (boxId, portId, area) {  // area: {x1, x2, y1, y2}
     var box = this._box(boxId),
         container,
-        cRect = new AutoRouterRect(),
+        cRect = new ArRect(),
         port = new AutoRouterPort(),
         rect = this._createRectFromArea(area),
         attr;
@@ -323,7 +319,7 @@ AutoRouter.prototype._createPort = function (boxId, portId, area) {  // area: {x
 };
 
 AutoRouter.prototype._createRectFromArea = function (area) {
-    var rect = new AutoRouterRect(area.x1, area.y1, area.x2, area.y2);
+    var rect = new ArRect(area.x1, area.y1, area.x2, area.y2);
     this._setValidRectSize(rect);
     return rect;
 };
