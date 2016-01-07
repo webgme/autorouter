@@ -78,10 +78,10 @@ ArPoint.prototype.plus = function (otherObject) { //equivalent to +
 ArPoint.prototype.minus = function (otherObject) {
     var objectCopy = new ArPoint(otherObject);
 
-    if (otherObject.cx || otherObject.cy) {
+    if (otherObject.cx !== undefined && otherObject.cy !== undefined) {
         objectCopy.subtract(this);
 
-    } else if (otherObject.x || otherObject.y) {
+    } else if (otherObject.x !== undefined && otherObject.y !== undefined) {
         objectCopy = new ArSize();
         objectCopy.cx = this.x - otherObject.x;
         objectCopy.cy = this.y - otherObject.y;
