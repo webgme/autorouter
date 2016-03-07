@@ -232,19 +232,12 @@ AutoRouter.prototype._removeBox = function (id) {  // public id
 // Paths
 
 AutoRouter.prototype._createPath = function (id, srcId, dstId) {  // public id
-    // What is going on here? ...
-    // srcId is a box -> get all the ports
-    // srcId is a list of ports -> get the raw ports
+    var srcPorts = this._getPortsFor(srcId),
+        dstPorts = this._getPortsFor(dstId),
+        path;
 
-    // Check out how boxes are added...
-    var srcPorts,
-        dstPorts,
-        path,
-        i;
-
-    srcPorts = this._getPortsFor(srcId);
-    dstPorts = this._getPortsFor(dstId);
-
+    assert(srcPorts, 'Missing srcPorts (' + srcPorts + ')');
+    assert(dstPorts, 'Missing dstPorts (' + dstPorts + ')');
     path = this._graph.addPath(true, srcPorts, dstPorts);
     path.id = id;
 
@@ -253,6 +246,7 @@ AutoRouter.prototype._createPath = function (id, srcId, dstId) {  // public id
 
 AutoRouter.prototype._getPortsFor = function (boxId) {
     if (boxId instanceof Array) {  // list of ports -> not a boxId
+        // FIXME: These ports would also need to be resolved!
         return boxId;
     } else {  // boxId is a box id -> get the ports
         var portIds = Object.keys(this._portIds[boxId]),
@@ -262,6 +256,11 @@ AutoRouter.prototype._getPortsFor = function (boxId) {
             assert(this._portIds[boxId][portIds[i]].ports.length === 1);
             ports.push(this._portIds[boxId][portIds[i]].ports[0]);
         }
+        assert(ports, 'no ports found (' + ports + ')');
+        for (var i = ports.length; i--;) {
+            assert (ports[i].owner, 'Invalid owner');
+        }
+        return ports;
     }
 };
 

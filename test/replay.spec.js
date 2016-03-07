@@ -28,7 +28,7 @@ describe('AutoRouter', function () {
 
         it('basic model with ports', function (done) {
             var actions = require('./test-cases/basic.json');
-            bugPlayer.test(actions, done);
+            bugPlayer.test(actions, {verbose: true}, done);
         });
 
         it('bug report 1', function (done) {
