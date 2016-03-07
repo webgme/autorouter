@@ -35,7 +35,7 @@ AutoRouter.prototype.clear = function () {
 AutoRouter.prototype.setBox = function(id, rect) {
     var box;
     if (rect === null) {  // Remove the box
-        this._removeBox(id);
+        return this._removeBox(id);
     }
 
     if (!this._boxIds[id]) {
@@ -61,8 +61,10 @@ AutoRouter.prototype.setPort = function(boxId, portId, area) {
         this._removePort(boxId, portId);
     }
 
+    assert(this._box(boxId), 'Box "' + boxId + '" does not exist');
     if (!this._portIds[boxId] || !this._portIds[boxId][portId]) {
         this._createPort(boxId, portId, area);
+        assert(this._port(boxId, portId), 'Port not added!');
     } else {
         this._updatePort(boxId, portId, area);
     }
@@ -156,16 +158,8 @@ AutoRouter.prototype._box = function (id) {
 };
 
 AutoRouter.prototype._port = function (boxId, id) {
-    var box = this._box(boxId),
-        port;
-
-    // FIXME: this may need to change...
-    for (var i = box.ports.length; i--;) {
-        if (box.ports[i].id === id) {
-            return box.ports[i];
-        }
-    }
-    return null;
+    assert(boxId !== undefined && id !== undefined, 'Missing ' + (boxId ? 'boxId' : 'id'));
+    return this._portIds[boxId][id];
 };
 
 AutoRouter.prototype._path = function (id) {
@@ -225,23 +219,21 @@ AutoRouter.prototype._removeBox = function (id) {  // public id
     var box = this._box(id),
         ports = Object.keys(this._portIds[id]);
 
-    this._graph.deleteBox(box);
-
-    delete this._boxIds[id];
-
     // Remove all ports
     for (var i = ports.length; i--;) {
-        this._removePort(ports[i]);
+        this._removePort(id, ports[i]);
     }
 
+    this._graph.deleteBox(box);
+    delete this._boxIds[id];
     delete this._portIds[id];
 };
 
 // Paths
 
 AutoRouter.prototype._createPath = function (id, srcId, dstId) {  // public id
-    var srcContainerIds = Object.keys(this._box[srcId]),
-        dstContainerIds = Object.keys(this._box[dstId]),
+    var srcContainerIds = Object.keys(this._box(srcId)),
+        dstContainerIds = Object.keys(this._box(dstId)),
         srcPorts = [],
         dstPorts = [],
         containerId,
@@ -250,12 +242,12 @@ AutoRouter.prototype._createPath = function (id, srcId, dstId) {  // public id
 
     for (i = srcContainerIds.length; i--;) {
         containerId = srcContainerIds[i];
-        srcPorts = srcPorts.concat(this._box[srcId][containerId].ports);
+        srcPorts = srcPorts.concat(this._box(srcId)[containerId].ports);
     }
 
     for (i = dstContainerIds.length; i--;) {
         containerId = dstContainerIds[i];
-        dstPorts = dstPorts.concat(this._box[dstId][containerId].ports);
+        dstPorts = dstPorts.concat(this._box(dstId)[containerId].ports);
     }
 
     path = this._graph.addPath(true, srcPorts, dstPorts);
@@ -305,7 +297,7 @@ AutoRouter.prototype._createPort = function (boxId, portId, area) {  // area: {x
 
     // Create a container rect
     cRect.assign(rect);
-    cRect.inflateRect(rect);
+    cRect.inflateRect(1);
     container = this._createBox({
         x1: cRect.left,
         y1: cRect.ceil,
