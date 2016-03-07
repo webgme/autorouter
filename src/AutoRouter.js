@@ -72,7 +72,7 @@ AutoRouter.prototype.setPort = function(boxId, portId, area) {
 
 AutoRouter.prototype.setPath = function(id, srcId, dstId) {
     if (srcId === null) {
-        this._removePath(id);
+        return this._removePath(id);
     }
 
     if (!this._pathIds[id]) {
@@ -232,28 +232,37 @@ AutoRouter.prototype._removeBox = function (id) {  // public id
 // Paths
 
 AutoRouter.prototype._createPath = function (id, srcId, dstId) {  // public id
-    var srcContainerIds = Object.keys(this._box(srcId)),
-        dstContainerIds = Object.keys(this._box(dstId)),
-        srcPorts = [],
-        dstPorts = [],
-        containerId,
+    // What is going on here? ...
+    // srcId is a box -> get all the ports
+    // srcId is a list of ports -> get the raw ports
+
+    // Check out how boxes are added...
+    var srcPorts,
+        dstPorts,
         path,
         i;
 
-    for (i = srcContainerIds.length; i--;) {
-        containerId = srcContainerIds[i];
-        srcPorts = srcPorts.concat(this._box(srcId)[containerId].ports);
-    }
-
-    for (i = dstContainerIds.length; i--;) {
-        containerId = dstContainerIds[i];
-        dstPorts = dstPorts.concat(this._box(dstId)[containerId].ports);
-    }
+    srcPorts = this._getPortsFor(srcId);
+    dstPorts = this._getPortsFor(dstId);
 
     path = this._graph.addPath(true, srcPorts, dstPorts);
     path.id = id;
 
     this._pathIds[id] = path.id;
+};
+
+AutoRouter.prototype._getPortsFor = function (boxId) {
+    if (boxId instanceof Array) {  // list of ports -> not a boxId
+        return boxId;
+    } else {  // boxId is a box id -> get the ports
+        var portIds = Object.keys(this._portIds[boxId]),
+            ports = [];
+
+        for (var i = portIds.length; i--;) {
+            assert(this._portIds[boxId][portIds[i]].ports.length === 1);
+            ports.push(this._portIds[boxId][portIds[i]].ports[0]);
+        }
+    }
 };
 
 AutoRouter.prototype._updatePath = function (id, srcId, dstId) {  // public id
