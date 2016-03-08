@@ -105,24 +105,26 @@ AutoRouter.prototype.routeAsync = function (options) {
 };
 
 AutoRouter.prototype.box = function (id) {
-    var pBox = this._box(id);  // private box
+    var rect = this._box(id).rect;  // private box
     return {
         id: id,
-        x1: pBox.rect.left,
-        x2: pBox.rect.right,
-        y1: pBox.rect.ceil,
-        y2: pBox.rect.floor
+        x: rect.left,
+        width: rect.right - rect.left,
+        y: rect.ceil,
+        height: rect.floor - rect.ceil
     };
 };
 
 AutoRouter.prototype.port = function (boxId, id) {
-    var pPort = this._port(boxId, id);  // private box
+    var container = this._port(boxId, id),
+        rect = container.ports[0].rect;  // private box
+
     return {
         id: id,
-        x1: pPort.rect.left,
-        x2: pPort.rect.right,
-        y1: pPort.rect.ceil,
-        y2: pPort.rect.floor
+        x: rect.left,
+        width: rect.right - rect.left,
+        y: rect.ceil,
+        height: rect.floor - rect.ceil
     };
 };
 
@@ -288,7 +290,7 @@ AutoRouter.prototype._setCustomPath = function (path, points) {  // public id
 
 // Ports
 
-AutoRouter.prototype._createPort = function (boxId, portId, area) {  // area: {x1, x2, y1, y2}
+AutoRouter.prototype._createPort = function (boxId, portId, area) {  // area: [[x1, y1], [x2, y2]]
     var box = this._box(boxId),
         container,
         cRect = new ArRect(),
