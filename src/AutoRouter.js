@@ -105,7 +105,14 @@ AutoRouter.prototype.routeAsync = function (options) {
 };
 
 AutoRouter.prototype.box = function (id) {
-    var rect = this._box(id).rect;  // private box
+    var pBox = this._box(id),  // private box
+        rect;
+
+    if (!pBox) {
+        return null;
+    }
+
+    rect = pBox.rect;
     return {
         id: id,
         x: rect.left,
@@ -278,14 +285,13 @@ AutoRouter.prototype._removePath = function (id) {  // public id
 };
 
 AutoRouter.prototype._setCustomPath = function (path, points) {  // public id
-    path.setAutoRouting(true);
-
     // Convert points to array of ArPoints
     points = points.map(function (point) {
         return new ArPoint(point[0], point[1]);
     });
 
     path.setCustomPathPoints(points);
+    path.setAutoRouting(false);
 };
 
 // Ports

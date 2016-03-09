@@ -33,35 +33,77 @@ describe.only('Basic', function () {
     describe('Box', function () {
         var box;
 
-        before(function() {
-            autorouter = new AutoRouter();
-            autorouter.setBox('src', {x1: 1, y1: 1, x2: 8, y2: 8});
+        describe('querying', function () {
+            before(function() {
+                autorouter = new AutoRouter();
+                autorouter.setBox('src', {x1: 1, y1: 1, x2: 8, y2: 8});
 
-            box = autorouter.box('src', 'ex');
+                box = autorouter.box('src');
+            });
+
+            it('should return object with "id"', function() {
+                assert(box.id);
+            });
+
+            it('should return object with "x"', function() {
+                assert(box.x);
+            });
+
+            it('should return object with "width"', function() {
+                assert(box.width);
+            });
+
+            it('should return object with "y"', function() {
+                assert(box.y);
+            });
+
+            it('should return object with "height"', function() {
+                assert(box.height);
+            });
+
+            it('should set correct width', function() {
+                assert.equal(box.width, 7);
+            });
         });
 
-        it('should return object with "id"', function() {
-            assert(box.id);
+        describe('resizing', function () {
+            before(function() {
+                autorouter = new AutoRouter();
+                autorouter.setBox('src', {x1: 1, y1: 1, x2: 8, y2: 8});
+                autorouter.setBox('src', {x1: 10, y1: 10, x2: 80, y2: 80});
+
+                box = autorouter.box('src');
+            });
+
+            it('should return object with correct "x"', function() {
+                assert.equal(box.x, 10);
+            });
+
+            it('should return object with correct "width"', function() {
+                assert.equal(box.width, 70);
+            });
+
+            it('should return object with correct "y"', function() {
+                assert.equal(box.y, 10);
+            });
+
+            it('should return object with correct "height"', function() {
+                assert.equal(box.height, 70);
+            });
+
         });
 
-        it('should return object with "x"', function() {
-            assert(box.x);
-        });
+        describe('deleting', function () {
+            before(function() {
+                autorouter = new AutoRouter();
+                autorouter.setBox('src', {x1: 1, y1: 1, x2: 8, y2: 8});
+                autorouter.setBox('src', null);
+                box = autorouter.box('src');
+            });
 
-        it('should return object with "width"', function() {
-            assert(box.width);
-        });
-
-        it('should return object with "y"', function() {
-            assert(box.y);
-        });
-
-        it('should return object with "height"', function() {
-            assert(box.height);
-        });
-
-        it('should set correct width', function() {
-            assert.equal(box.width, 7);
+            it('should return null', function() {
+                assert.equal(box, null);
+            });
         });
     });
 
@@ -130,19 +172,14 @@ describe.only('Basic', function () {
                 x2: 790,
                 y2: 410
             });
-        });
-
-        it('should be able to create paths', function() {
             autorouter.setPath('myPath', 'src', 'dst');
         });
 
         it('should be able to route paths', function() {
-            autorouter.setPath('myPath', 'src', 'dst');
             autorouter.routeSync();
         });
 
         it('should start in \'src\'', function() {
-            autorouter.setPath('myPath', 'src', 'dst');
             autorouter.routeSync();
 
             var src = autorouter.box('src'),
@@ -155,7 +192,6 @@ describe.only('Basic', function () {
         });
 
         it('should end in \'dst\'', function() {
-            autorouter.setPath('myPath', 'src', 'dst');
             autorouter.routeSync();
 
             var src = autorouter.box('src'),
@@ -165,6 +201,19 @@ describe.only('Basic', function () {
                 'for endpoint: ' + endpoint[0]);
             assert(endpoint[1] > 407 && endpoint[1] < 410, 'Incorrect y value ' +
                 ' for endpoint: ' + endpoint[1]);
+        });
+
+        describe('custom routing', function() {
+
+            it('should be able to set custom paths', function() {
+                var path = [[150, 107], [500, 413]];
+                autorouter.setCustomRouting('myPath', path);
+                autorouter.routeSync();
+                console.log('path', path);
+            });
+
+            it('should be able to remove custom paths', function() {
+            });
         });
     });
 
