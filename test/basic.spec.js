@@ -204,15 +204,34 @@ describe.only('Basic', function () {
         });
 
         describe('custom routing', function() {
+            var path;
 
-            it('should be able to set custom paths', function() {
-                var path = [[150, 107], [500, 413]];
+            before(function() {
+                path = [[150, 107], [500, 413]];
                 autorouter.setCustomRouting('myPath', path);
                 autorouter.routeSync();
-                console.log('path', path);
+            });
+
+            it('should be able to set custom paths', function() {
+                var actualPts = autorouter.path('myPath').points;
+                // remove the start/end points
+                actualPts.shift();
+                actualPts.pop();
+
+                // Test all the points
+                actualPts.forEach(function(point, i) {
+                    assert.equal(point[0], path[i][0]);
+                    assert.equal(point[1], path[i][1]);
+                });
             });
 
             it('should be able to remove custom paths', function() {
+                autorouter.setCustomRouting('myPath', null);
+                autorouter.routeSync();
+                autorouter.path('myPath').points
+                    .forEach(function(point) {
+                        assert.notEqual(point[0], 500);
+                    });
             });
         });
     });
