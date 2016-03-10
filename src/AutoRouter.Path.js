@@ -40,20 +40,10 @@ AutoRouterPath.prototype.hasOwner = function () {
     return this.owner !== null;
 };
 
-AutoRouterPath.prototype.setStartPorts = function (newPorts) {
-    this.startports = newPorts;
-
-    if (this.startport) {
-        this.calculateStartPorts();
-    }
-};
-
-AutoRouterPath.prototype.setEndPorts = function (newPorts) {
-    this.endports = newPorts;
-
-    if (this.endport) {
-        this.calculateEndPorts();
-    }
+AutoRouterPath.prototype.setStartEndPorts = function (start, end) {
+    this.startports = start;
+    this.endports = end;
+    this.calculateStartEndPorts();
 };
 
 AutoRouterPath.prototype.clearPorts = function () {

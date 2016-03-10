@@ -9,7 +9,7 @@ var AutoRouter = require('../src/AutoRouter'),
     assert = require('assert'),
     autorouter;
 
-describe.only('basic', function () {
+describe('basic', function () {
     'use strict';
 
     beforeEach(function() {

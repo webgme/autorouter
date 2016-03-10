@@ -8,7 +8,8 @@
 'use strict';
 
 var CONSTANTS = require('./AutoRouter.Constants'),
-    assert = require('./AutoRouter.Utils').assert,
+    utils = require('./AutoRouter.Utils'),
+    assert = utils.assert,
     ArPoint = require('./AutoRouter.Point'),
     ArRect = require('./AutoRouter.Rect'),
     AutoRouterGraph = require('./AutoRouter.Graph'),
@@ -20,6 +21,11 @@ var AutoRouter = function () {
     this._portIds = {};
     this._pathIds = {};
 
+    this._pathsToUpdateOnDeletion = {};  // portIds => paths
+    this._pathsToUpdateOnAddition = {};  // boxIds => paths
+    this._pathSrc = {};
+    this._pathDst = {};
+
     this._graph = new AutoRouterGraph();
 };
 
@@ -30,6 +36,11 @@ AutoRouter.prototype.clear = function () {
     this._boxIds = {};
     this._portIds = {};
     this._pathIds = {};
+
+    this._pathsToUpdateOnDeletion = {};  // portIds => paths
+    this._pathsToUpdateOnAddition = {};  // boxIds => paths
+    this._pathSrc = {};
+    this._pathDst = {};
 };
 
 AutoRouter.prototype.setBox = function(id, rect) {
@@ -130,7 +141,7 @@ AutoRouter.prototype.port = function (boxId, id) {
         return null;
     }
 
-    rect = container.ports[0].rect;  // private box
+    rect = container.ports[0].rect;
 
     return {
         id: id,
@@ -242,6 +253,7 @@ AutoRouter.prototype._removeBox = function (id) {  // public id
     this._graph.deleteBox(box);
     delete this._boxIds[id];
     delete this._portIds[id];
+    delete this._pathsToUpdateOnAddition[id];
 };
 
 // Paths
@@ -249,14 +261,38 @@ AutoRouter.prototype._removeBox = function (id) {  // public id
 AutoRouter.prototype._createPath = function (id, srcId, dstId) {  // public id
     var srcPorts = this._getPortsFor(srcId),
         dstPorts = this._getPortsFor(dstId),
+        ports = srcPorts.concat(dstPorts),
         path;
 
     assert(srcPorts, 'Missing srcPorts (' + srcPorts + ')');
     assert(dstPorts, 'Missing dstPorts (' + dstPorts + ')');
+
     path = this._graph.addPath(true, srcPorts, dstPorts);
     path.id = id;
-
     this._pathIds[id] = path.id;
+
+    // Update the updates dictionaries
+    for (var i = ports.length; i--;) {
+        if (!this._pathsToUpdateOnDeletion[ports[i].id]) {
+            this._pathsToUpdateOnDeletion[ports[i].id] = [];
+        }
+        this._pathsToUpdateOnDeletion[ports[i].id].push(path);
+    }
+
+    if (typeof srcId === 'string') {
+        if (!this._pathsToUpdateOnAddition[srcId]) {
+            this._pathsToUpdateOnAddition[srcId] = [];
+        }
+        this._pathsToUpdateOnAddition[srcId].push(path);
+    }
+    if (typeof dstId === 'string') {
+        if (!this._pathsToUpdateOnAddition[dstId]) {
+            this._pathsToUpdateOnAddition[dstId] = [];
+        }
+        this._pathsToUpdateOnAddition[dstId].push(path);
+    }
+    this._pathSrc[id] = srcId;
+    this._pathDst[id] = dstId;
 };
 
 AutoRouter.prototype._getPortsFor = function (boxId) {
@@ -288,6 +324,8 @@ AutoRouter.prototype._removePath = function (id) {  // public id
     var path = this._path(id);
     this._graph.deletePath(path);
     delete this._pathIds[id];
+    delete this._pathSrc[id];
+    delete this._pathDst[id];
 };
 
 AutoRouter.prototype._setCustomPath = function (path, points) {  // public id
@@ -312,6 +350,7 @@ AutoRouter.prototype._createPort = function (boxId, portId, area) {  // area: [[
 
     // Create the port
     attr = this._getPortAttributes(box.rect, area);
+    port.id = boxId + '/|\\' + portId;
     port.setLimitedDirs(false);
     port.attributes = attr;
     this._setValidRectSize(rect);
@@ -330,6 +369,21 @@ AutoRouter.prototype._createPort = function (boxId, portId, area) {  // area: [[
     box.addChild(container);
     container.addPort(port);
     this._portIds[boxId][portId] = container;
+
+    // Update paths as needed
+    var paths = this._pathsToUpdateOnAddition[boxId] || [],
+        start,
+        end;
+
+    for (var i = paths.length; i--;) {
+        // Get the new ports
+        start = this._getPortsFor(this._pathSrc[paths[i].id]);
+        end = this._getPortsFor(this._pathDst[paths[i].id]);
+
+        // Disconnect and update path
+        this._graph.disconnect(paths[i]);
+        paths[i].setStartEndPorts(start, end);
+    }
 };
 
 AutoRouter.prototype._createRectFromArea = function (area) {
@@ -385,9 +439,22 @@ AutoRouter.prototype._updatePort = function (boxId, portId, area) {
 };
 
 AutoRouter.prototype._removePort = function (boxId, portId) {
-    var container = this._port(boxId, portId);
+    var container = this._port(boxId, portId),
+        port = container.ports[0],
+        paths = this._pathsToUpdateOnDeletion[port.id] || [],
+        start,
+        end;
 
     this._graph.deleteBox(container);
+
+    // Update paths
+    delete this._pathsToUpdateOnDeletion[port.id];
+    for (var i = paths.length; i--;) {
+        start = paths[i].startports;
+        end = paths[i].endports;
+        utils.removeFromArrays(port, start, end);
+        paths[i].setStartEndPorts(start, end);
+    }
     delete this._portIds[boxId][portId];
 };
 

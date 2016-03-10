@@ -2169,8 +2169,7 @@ AutoRouterGraph.prototype.addPath = function (isAutoRouted, startports, endports
     var path = new AutoRouterPath();
 
     path.setAutoRouting(isAutoRouted);
-    path.setStartPorts(startports);
-    path.setEndPorts(endports);
+    path.setStartEndPorts(startports, endports);
     this._add(path);
 
     return path;
