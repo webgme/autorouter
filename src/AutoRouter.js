@@ -382,7 +382,9 @@ AutoRouter.prototype._createPort = function (boxId, portId, area) {  // area: [[
 
         // Disconnect and update path
         this._graph.disconnect(paths[i]);
-        paths[i].setStartEndPorts(start, end);
+        if (start.length && end.length) {
+            paths[i].setStartEndPorts(start, end);
+        }
     }
 };
 
@@ -453,7 +455,9 @@ AutoRouter.prototype._removePort = function (boxId, portId) {
         start = paths[i].startports;
         end = paths[i].endports;
         utils.removeFromArrays(port, start, end);
-        paths[i].setStartEndPorts(start, end);
+        if (start.length && end.length) {
+            paths[i].setStartEndPorts(start, end);
+        }
     }
     delete this._portIds[boxId][portId];
 };

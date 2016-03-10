@@ -106,7 +106,7 @@ describe('functional', function () {
             autorouter.routeSync();
         });
 
-        it.skip('should route after complete port change', function () {
+        it('should route after complete port change - hard', function () {
             autorouter.setPort('dst', 'goodbye', null);
             autorouter.setPort('dst', 'ex', {
                 x1: 410,
