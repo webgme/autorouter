@@ -9,7 +9,7 @@ var AutoRouter = require('../src/AutoRouter'),
     assert = require('assert'),
     autorouter;
 
-describe.only('Basic', function () {
+describe.only('basic', function () {
     'use strict';
 
     beforeEach(function() {
@@ -110,36 +110,81 @@ describe.only('Basic', function () {
     describe('Port', function () {
         var port;
 
-        before(function() {
-            autorouter = new AutoRouter();
-            autorouter.setBox('src', {x1: 0, y1: 0, x2: 8, y2: 8});
-            autorouter.setPort('src', 'ex', {x1: 1, y1: 1, x2: 7, y2: 1});
+        describe('querying', function () {
+            before(function() {
+                autorouter = new AutoRouter();
+                autorouter.setBox('src', {x1: 0, y1: 0, x2: 8, y2: 8});
+                autorouter.setPort('src', 'ex', {x1: 1, y1: 1, x2: 7, y2: 1});
 
-            port = autorouter.port('src', 'ex');
+                port = autorouter.port('src', 'ex');
+            });
+
+            it('should return object with "id"', function() {
+                assert(port.id);
+            });
+
+            it('should return object with "x"', function() {
+                assert(port.x);
+            });
+
+            it('should return object with "width"', function() {
+                assert(port.width);
+            });
+
+            it('should return object with "y"', function() {
+                assert(port.y);
+            });
+
+            it('should return object with "height"', function() {
+                assert(port.height);
+            });
+
+            it('should set correct width', function() {
+                assert.equal(port.width, 6);
+            });
         });
 
-        it('should return object with "id"', function() {
-            assert(port.id);
+        describe('resizing', function () {
+            before(function() {
+                autorouter = new AutoRouter();
+                autorouter.setBox('src', {x1: 0, y1: 0, x2: 8, y2: 8});
+                autorouter.setPort('src', 'ex', {x1: 1, y1: 1, x2: 7, y2: 1});
+                autorouter.setPort('src', 'ex', {x1: 10, y1: 10, x2: 70, y2: 70});
+
+                port = autorouter.port('src', 'ex');
+            });
+
+            it('should return object with correct "x"', function() {
+                assert.equal(port.x, 10);
+            });
+
+            it('should return object with correct "y"', function() {
+                assert.equal(port.y, 10);
+            });
+
+            it('should return object with correct "width"', function() {
+                assert.equal(port.width, 60);
+            });
+
+            it('should return object with correct "height"', function() {
+                assert.equal(port.height, 60);
+            });
+
         });
 
-        it('should return object with "x"', function() {
-            assert(port.x);
-        });
+        describe('deleting', function () {
+            before(function() {
+                autorouter = new AutoRouter();
+                autorouter.setBox('src', {x1: 0, y1: 0, x2: 8, y2: 8});
+                autorouter.setPort('src', 'ex', {x1: 1, y1: 1, x2: 7, y2: 1});
+                autorouter.setPort('src', 'ex', null);
 
-        it('should return object with "width"', function() {
-            assert(port.width);
-        });
+                port = autorouter.port('src', 'ex');
+            });
 
-        it('should return object with "y"', function() {
-            assert(port.y);
-        });
-
-        it('should return object with "height"', function() {
-            assert(port.height);
-        });
-
-        it('should set correct width', function() {
-            assert.equal(port.width, 6);
+            it('should return object with correct "height"', function() {
+                assert.equal(port, null);
+            });
         });
     });
 
@@ -235,5 +280,4 @@ describe.only('Basic', function () {
             });
         });
     });
-
 });

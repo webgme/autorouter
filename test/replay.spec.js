@@ -5,7 +5,7 @@
  */
 
 // Tests
-describe('AutoRouter', function () {
+describe.skip('AutoRouter', function () {
     'use strict';
     var srcPath = __dirname + '/../src/',
         utils = require('./utils/autorouter.common'),

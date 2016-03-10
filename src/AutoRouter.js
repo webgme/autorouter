@@ -58,7 +58,7 @@ AutoRouter.prototype.setDependentBox = function(parentId, childId) {
 
 AutoRouter.prototype.setPort = function(boxId, portId, area) {
     if (area === null) {
-        this._removePort(boxId, portId);
+        return this._removePort(boxId, portId);
     }
 
     assert(this._box(boxId), 'Box "' + boxId + '" does not exist');
@@ -124,7 +124,13 @@ AutoRouter.prototype.box = function (id) {
 
 AutoRouter.prototype.port = function (boxId, id) {
     var container = this._port(boxId, id),
-        rect = container.ports[0].rect;  // private box
+        rect;
+
+    if (!container) {
+        return null;
+    }
+
+    rect = container.ports[0].rect;  // private box
 
     return {
         id: id,
