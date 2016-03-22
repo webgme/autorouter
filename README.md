@@ -9,8 +9,6 @@ The autorouter provides intelligent routing for connections on box diagrams.
 
     + return the new box or null (if removed)
 
-# + setDependentBox(parentId, childId)
-
 + setPort(boxId, portId, area)
     + setPort('box-10', 'north', {x1, y1, x2, y2})  // Create/update
     + setPort('box-10', 'north', null)  // removal
