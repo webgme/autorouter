@@ -117,4 +117,57 @@ describe('functional', function () {
             autorouter.routeSync();
         });
     });
+
+    describe('routing and box change', function () {
+        beforeEach(function() {
+            autorouter = new AutoRouter();
+
+            autorouter.setBox('src', {
+                x1: 100,
+                y1: 100,
+                x2: 200,
+                y2: 200
+            });
+            autorouter.setPort('src', 'ex', {
+                x1: 110,
+                y1: 110,
+                x2: 190,
+                y2: 110
+            });
+
+            autorouter.setBox('dst', {
+                x1: 400,
+                y1: 400,
+                x2: 800,
+                y2: 800
+            });
+            autorouter.setPort('dst', 'goodbye', {
+                x1: 410,
+                y1: 790,
+                x2: 790,
+                y2: 790
+            });
+            autorouter.setPath('myPath', 'src', 'dst');
+        });
+
+        it('should route after complete box change', function () {
+            //autorouter.setBox('dst', null);
+            autorouter.setBox('dst', {
+                x1: 420,
+                y1: 420,
+                x2: 820,
+                y2: 820
+            });
+
+            autorouter.setPort('dst', 'goodbye', {
+                x1: 430,
+                y1: 810,
+                x2: 810,
+                y2: 810
+            });
+
+            autorouter.routeSync();
+        });
+
+    });
 });

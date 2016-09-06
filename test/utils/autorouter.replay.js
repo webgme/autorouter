@@ -62,7 +62,7 @@ AutoRouterReplayer.prototype.testLocal = function (actions, options, callback) {
     // Run the tests
     for (i = 0; i < last; i += 1) {
         this.log('Calling Action #' + i + ':', actions[i].action, 'with', actions[i].args);
-        before(this.autorouter);
+        before(this.autorouter, i);
         try {
             this._invokeAutoRouterMethodUnsafe(actions[i].action, actions[i].args);
         } catch (e) {
@@ -70,7 +70,7 @@ AutoRouterReplayer.prototype.testLocal = function (actions, options, callback) {
                 throw e;
             }
         }
-        after(this.autorouter);
+        after(this.autorouter, i);
     }
 
     callback();

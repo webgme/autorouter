@@ -5,11 +5,12 @@
  */
 
 // Tests
+var srcPath = __dirname + '/../src/',
+    assert = require('assert');
+
 describe.skip('AutoRouter', function () {
     'use strict';
-    var srcPath = __dirname + '/../src/',
-        utils = require('./utils/autorouter.common'),
-        assert = require('assert'),
+    var utils = require('./utils/autorouter.common'),
         router,
         gmeConfig,
         ARBugPlayer = require('./utils/autorouter.replay'),
@@ -27,8 +28,17 @@ describe.skip('AutoRouter', function () {
         });
 
         it('basic model with ports', function (done) {
-            var actions = require('./test-cases/basic.json');
-            bugPlayer.test(actions, {verbose: true}, done);
+            var actions = require('./test-cases/basic.json'),
+                opts = {
+                    verbose: true,
+                    after: function(router, i) {
+                        if (i > 27) {
+                            router.routeSync();
+                            console.log('routeSync didn\'t break...');
+                        }
+                    }
+                };
+            bugPlayer.test(actions, opts, done);
         });
 
         it('bug report 1', function (done) {
@@ -958,93 +968,95 @@ describe.skip('AutoRouter', function () {
         //});
     });
 
-    describe('Utility Fn tests', function () {
-        var arUtils = require(srcPath + 'AutoRouter.Utils');
+});
 
-        describe('toArray tests', function () {
-            it('should convert array like objects to array', function() {
-                var obj = {0: 'd', 1: 'a', 2: 'b', 3: 'c', length: 4},
-                    array = arUtils.toArray(obj);
+describe('Utility Fn tests', function () {
+    var arUtils = require(srcPath + 'AutoRouter.Utils');
 
-                assert(array instanceof Array);
-                assert(array.length === 4, 'Array length should be 4 but is '+array.length);
+    describe('toArray tests', function () {
+        it('should convert array like objects to array', function() {
+            var obj = {0: 'd', 1: 'a', 2: 'b', 3: 'c', length: 4},
+                array = arUtils.toArray(obj);
 
-                for (var i = array.length; i--;) {
-                    assert(obj[i] === array[i]);
-                }
-            });
+            assert(array instanceof Array);
+            assert(array.length === 4, 'Array length should be 4 but is '+array.length);
 
-            it('should stop conversion when index is missing', function() {
-                var obj = {0: 'd', 1: 'a', 2: 'b', 7: 'c', length: 3},
-                    array = arUtils.toArray(obj);
-
-                assert(array instanceof Array);
-                assert(array.length === 3);
-
-                for (var i = array.length; i--;) {
-                    assert(obj[i] === array[i]);
-                }
-            });
-
-            it('should return [] for non array like things', function() {
-                var obj = {1: 'a', 2: 'b', 7: 'c'},
-                    array = arUtils.toArray(obj);
-
-                assert(array instanceof Array);
-                assert(array.length === 0);
-            });
+            for (var i = array.length; i--;) {
+                assert(obj[i] === array[i]);
+            }
         });
 
-        describe('floatEquals tests', function () {
-            it('should return true for 8, 8.09', function() {
-                assert(arUtils.floatEquals(8, 8.09));
-            });
+        it('should stop conversion when index is missing', function() {
+            var obj = {0: 'd', 1: 'a', 2: 'b', 7: 'c', length: 3},
+                array = arUtils.toArray(obj);
 
-            it('should return true for 108.94, 109', function() {
-                assert(arUtils.floatEquals(108.94, 109));
-            });
+            assert(array instanceof Array);
+            assert(array.length === 3);
 
-            it('should return false for 8, 8.1', function() {
-                assert(!arUtils.floatEquals(8, 8.1));
-            });
-
-            it('should return false for 108.9, 109', function() {
-                assert(!arUtils.floatEquals(108.9, 109));
-            });
-
-            it('should return true for 109, 109', function() {
-                assert(arUtils.floatEquals(109, 109));
-            });
-
-            it('should return false for 108, 109', function() {
-                assert(!arUtils.floatEquals(108, 109));
-            });
+            for (var i = array.length; i--;) {
+                assert(obj[i] === array[i]);
+            }
         });
 
-        describe('roundTrunc tests', function () {
-            it('should round 10.999999 to 10.9', function() {
-                assert(arUtils.roundTrunc(10.999999, 1) === 10.9);
-            });
+        it('should return [] for non array like things', function() {
+            var obj = {1: 'a', 2: 'b', 7: 'c'},
+                array = arUtils.toArray(obj);
 
-            it('should round 10.90000001 to 10.9', function() {
-                assert(arUtils.roundTrunc(10.90000001, 1) === 10.9);
-            });
+            assert(array instanceof Array);
+            assert(array.length === 0);
+        });
+    });
 
-            it('should round -10.90000001 to -10.9', function() {
-                assert(arUtils.roundTrunc(-10.90000001, 1) === -10.9);
-            });
+    describe('floatEquals tests', function () {
+        it('should return true for 8, 8.09', function() {
+            assert(arUtils.floatEquals(8, 8.09));
+        });
 
-            it('should round -10.9999 to -10.9', function() {
-                assert(arUtils.roundTrunc(-10.9999, 1) === -10.9);
-            });
+        it('should return true for 108.94, 109', function() {
+            assert(arUtils.floatEquals(108.94, 109));
+        });
 
-            it('should round -10.9999 to -10.99', function() {
-                assert(arUtils.roundTrunc(-10.9999, 2) === -10.99);
-            });
+        it('should return false for 8, 8.1', function() {
+            assert(!arUtils.floatEquals(8, 8.1));
+        });
 
-            it('should round 10.9999 to 10.99', function() {
-                assert(arUtils.roundTrunc(10.9999, 2) === 10.99);
-            });
+        it('should return false for 108.9, 109', function() {
+            assert(!arUtils.floatEquals(108.9, 109));
+        });
+
+        it('should return true for 109, 109', function() {
+            assert(arUtils.floatEquals(109, 109));
+        });
+
+        it('should return false for 108, 109', function() {
+            assert(!arUtils.floatEquals(108, 109));
+        });
+    });
+
+    describe('roundTrunc tests', function () {
+        it('should round 10.999999 to 10.9', function() {
+            assert(arUtils.roundTrunc(10.999999, 1) === 10.9);
+        });
+
+        it('should round 10.90000001 to 10.9', function() {
+            assert(arUtils.roundTrunc(10.90000001, 1) === 10.9);
+        });
+
+        it('should round -10.90000001 to -10.9', function() {
+            assert(arUtils.roundTrunc(-10.90000001, 1) === -10.9);
+        });
+
+        it('should round -10.9999 to -10.9', function() {
+            assert(arUtils.roundTrunc(-10.9999, 1) === -10.9);
+        });
+
+        it('should round -10.9999 to -10.99', function() {
+            assert(arUtils.roundTrunc(-10.9999, 2) === -10.99);
+        });
+
+        it('should round 10.9999 to 10.99', function() {
+            assert(arUtils.roundTrunc(10.9999, 2) === 10.99);
         });
     });
 });
+

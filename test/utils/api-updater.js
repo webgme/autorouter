@@ -23,8 +23,9 @@ files.map(file => [file, JSON.parse(fs.readFileSync('./'+file, 'utf8'))])
         return info;
     })
     .forEach(info => {
-        console.log('INFO: '+JSON.stringify(info[1]));
         let filename = info[0];
+
+        console.log('INFO: '+JSON.stringify(info[1]));
         console.log('about to write to "' + filename + '"');
         fs.writeFileSync(filename, JSON.stringify(info[1], null, 2));
         console.log('Updated ' + filename);
