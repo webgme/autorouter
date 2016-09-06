@@ -4,8 +4,8 @@ The autorouter provides intelligent routing for connections on box diagrams.
 ## API
 + clear
 + setBox(id, rect)  // To create/resize/move
-    + setBox('myBox', {x1, x2, y1, y2})  // To remove   Should I do it this way??? 
-    + setBox(id, null)  // To remove   Should I do it this way??? 
+    + setBox('myBox', {x1, x2, y1, y2})  // resize
+    + setBox(id, null)  // To remove
 
     + return the new box or null (if removed)
 
