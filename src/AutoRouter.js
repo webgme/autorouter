@@ -54,6 +54,9 @@ AutoRouter.prototype.setBox = function(id, rect) {
         // Update records
         this._boxIds[id] = box.id;
         this._portIds[id] = {};
+        if (this._pathsToUpdateOnAddition[id]) {
+            this._updatePathsForBox(id);
+        }
     } else {
         this._updateBox(id, rect);
     }
@@ -253,7 +256,10 @@ AutoRouter.prototype._removeBox = function (id) {  // public id
     this._graph.deleteBox(box);
     delete this._boxIds[id];
     delete this._portIds[id];
-    delete this._pathsToUpdateOnAddition[id];
+
+    if (this._pathsToUpdateOnAddition[id].length === 0) {
+        delete this._pathsToUpdateOnAddition[id];
+    }
 };
 
 // Paths
@@ -316,16 +322,40 @@ AutoRouter.prototype._getPortsFor = function (boxId) {
 };
 
 AutoRouter.prototype._updatePath = function (id, srcId, dstId) {  // public id
-    this._removePath(id);
+    this._removePath(id, true);
     this._createPath(id, srcId, dstId);
 };
 
-AutoRouter.prototype._removePath = function (id) {  // public id
-    var path = this._path(id);
+AutoRouter.prototype._removePath = function (id, silent) {  // public id
+    var path = this._path(id),
+        src = this._pathSrc[id],
+        dst = this._pathDst[id];
+
     this._graph.deletePath(path);
     delete this._pathIds[id];
     delete this._pathSrc[id];
     delete this._pathDst[id];
+
+    if (!silent) {
+        this._clearOldBoxRecords(src, id);
+        this._clearOldBoxRecords(dst, id);
+    }
+};
+
+AutoRouter.prototype._clearOldBoxRecords = function (id, pathId) {  // public id
+    var boxIsDeleted = !this._boxIds[id],
+        hasRecord = this._pathsToUpdateOnAddition.hasOwnProperty(id);
+
+    if (hasRecord) {
+        for (var i = this._pathsToUpdateOnAddition[id].length; i--;) {
+            if (this._pathsToUpdateOnAddition[id][i].id === pathId) {
+                this._pathsToUpdateOnAddition[id].splice(i, 1);
+            }
+        }
+        if (boxIsDeleted && this._pathsToUpdateOnAddition[id].length === 0) {
+            delete this._pathsToUpdateOnAddition[id];
+        }
+    }
 };
 
 AutoRouter.prototype._setCustomPath = function (path, points) {  // public id
@@ -371,6 +401,10 @@ AutoRouter.prototype._createPort = function (boxId, portId, area) {  // area: [[
     this._portIds[boxId][portId] = container;
 
     // Update paths as needed
+    this._updatePathsForBox(boxId);
+};
+
+AutoRouter.prototype._updatePathsForBox = function (boxId) {
     var paths = this._pathsToUpdateOnAddition[boxId] || [],
         start,
         end;

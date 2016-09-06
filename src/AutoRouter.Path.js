@@ -62,7 +62,7 @@ AutoRouterPath.prototype.clearPorts = function () {
 
 AutoRouterPath.prototype.getStartPort = function () {
     assert(this.startports.length, 
-        'ARPort.getStartPort: Can\'t retrieve start port. from '+this.id);
+        `ARPath.getStartPort: Can\'t retrieve start port from ${this.id}`);
 
     if (!this.startport) {
         this.calculateStartPorts();
@@ -506,8 +506,10 @@ AutoRouterPath.prototype.setAutoRouting = function (arState) {
 };
 
 AutoRouterPath.prototype.destroy = function () {
-    if (this.isConnected()) {
+    if (this.startpoint) {
         this.startport.removePoint(this.startpoint);
+    }
+    if (this.endpoint) {
         this.endport.removePoint(this.endpoint);
     }
 };
