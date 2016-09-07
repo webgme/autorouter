@@ -9,7 +9,7 @@ var createNop = function(action) {
     return function(args) {
         return [{
             action,
-            args: []
+            args: args
         }];
     };
 };
@@ -70,6 +70,19 @@ var values = function(obj) {
     return Object.keys(obj).map(key => obj[key]);
 };
 
+CONVERSION_MAP.setPathCustomPoints = function(args) {
+    var points = args[0].points.map(point => point.slice(0, 2))
+    return [
+        {
+            action: 'setCustomRouting',
+            args: [
+                args[0].path,
+                points
+            ]
+        }
+    ];
+};
+
 CONVERSION_MAP.addPath = function(args) {
     var pathId = args[1],
         srcId = values(args[0].src)[0],
@@ -80,6 +93,10 @@ CONVERSION_MAP.addPath = function(args) {
     }
     if (!this.boxes[dstId]) {
         dstId = dstId.split(PORT_SEP)[0];
+    }
+
+    if (pathId instanceof Array) {
+        pathId = pathId[0];
     }
 
     this.paths[pathId] = true;
@@ -115,6 +132,7 @@ CONVERSION_MAP.setBoxRect = function(args) {
     return actions.concat(getSetPortActions(boxId, ports));
 };
 
+// TODO: Add move!!!
 CONVERSION_MAP.remove = function(args) {
     var id = args[0],
         action;

@@ -151,7 +151,7 @@ describe('functional', function () {
         });
 
         it('should route after complete box change', function () {
-            //autorouter.setBox('dst', null);
+            autorouter.setBox('dst', null);
             autorouter.setBox('dst', {
                 x1: 420,
                 y1: 420,

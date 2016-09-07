@@ -70,6 +70,22 @@ AutoRouter.prototype.setDependentBox = function(parentId, childId) {
     parent.addChild(child);
 };
 
+AutoRouter.prototype.moveBox = function(id, x, y) {
+    var box = this._box(id),
+        rect,
+        dx,
+        dy;
+
+    if (box) {
+        rect = box.rect;
+        dx = rect.left - x;
+        dy = rect.ceil - y;
+        this._graph.shiftBoxBy(box, dx, dy);
+    } else {
+        throw Error(`AutoRouter: Cannot find box ${id}" to move!`);
+    }
+};
+
 AutoRouter.prototype.setPort = function(boxId, portId, area) {
     if (area === null) {
         return this._removePort(boxId, portId);
@@ -99,8 +115,8 @@ AutoRouter.prototype.setPath = function(id, srcId, dstId) {
 AutoRouter.prototype.setCustomRouting = function(id, points) {
     var path = this._path(id);
 
-    if (path === undefined) {
-        throw 'AutoRouter: Need to have an AutoRouterPath type to set custom path points';
+    if (!path) {
+        throw Error('AutoRouter: Need to have an AutoRouterPath type to set custom path points');
     }
 
     if (points === null) {
@@ -257,7 +273,7 @@ AutoRouter.prototype._removeBox = function (id) {  // public id
     delete this._boxIds[id];
     delete this._portIds[id];
 
-    if (this._pathsToUpdateOnAddition[id].length === 0) {
+    if (this._pathsToUpdateOnAddition[id] && this._pathsToUpdateOnAddition[id].length === 0) {
         delete this._pathsToUpdateOnAddition[id];
     }
 };

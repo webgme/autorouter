@@ -9,17 +9,21 @@ var srcPath = __dirname + '/../../src/',
     PointList = require(srcPath + 'AutoRouter.PointList'),
     Point = require(srcPath + 'AutoRouter.Point'),
     assert = require('assert'),
+    count = 1,
     router;
 
 // Set up helpers
-var getNewGraph = function () {
+var getId = function(base) {
+    base = base || 'item';
+    return `${base}_${count++}`;
+};
 
+var getNewGraph = function () {
     router = new AutoRouter();
     return router;
 };
 
 var connectAll = function (boxes) {
-
     var i,
         j;
 
@@ -38,23 +42,38 @@ var addBox = function (options) {
         y = options.y,
         width = options.width || 100,
         height = options.height || 100,
+        ports,
+        boxId = getId(),
         boxDef = {
             x1: x,
             x2: x + width,
             y1: y,
-            y2: y + height,
-            ports: [
-                {
-                    id: 'top',
-                    area: [[x + 10, y + 10], [x + width - 10, y + 10]]
-                },
-                {
-                    id: 'bottom',
-                    area: [[x + 10, y + height - 10], [x + width - 10, y + height - 10]]
-                }
-            ]
+            y2: y + height
         };
-    return router.addBox(boxDef);
+
+    router.setBox(boxId, boxDef);
+    [
+        {
+            id: 'top',
+            area: {
+                x1: x + 10,
+                x2: x + width - 10,
+                y1: y + 10,
+                y2: y + 10
+            }
+        },
+        {
+            id: 'bottom',
+            area: {
+                x1: x + 10,
+                x2: x + width - 10,
+                y1: y + height - 10,
+                y2: y + height - 10
+            }
+        }
+    ].forEach(port => router.setPort(boxId, getId(port.id), port.area));
+
+    return boxId;
 };
 
 var addBoxes = function (locations) {

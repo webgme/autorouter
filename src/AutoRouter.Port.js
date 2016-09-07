@@ -404,13 +404,11 @@ AutoRouterPort.prototype.assertValid = function () {
 };
 
 AutoRouterPort.prototype.destroy = function () {
-    // Remove all points
-    this.owner = null;
-
     // Remove all points and self from all paths
     var point,
         path;
 
+    this.owner = null;
     for (var i = this.points.length; i--;) {
         for (var j = this.points[i].length; j--;) {
             point = this.points[i][j];

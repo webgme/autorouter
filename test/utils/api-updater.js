@@ -16,8 +16,9 @@ files.map(file => [file, JSON.parse(fs.readFileSync('./'+file, 'utf8'))])
         let actions = info[1],
             converter = new Converter();
 
-        info[1] = info[1]
-            .map(converter.convert.bind(converter))
+        console.log(`Updating ${info[0]}`);
+        info[1] = actions
+            .map(action => converter.convert(action))
             .reduce((prev, curr) => prev.concat(curr));  // flatten
 
         return info;

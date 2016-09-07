@@ -61,7 +61,7 @@ AutoRouterReplayer.prototype.testLocal = function (actions, options, callback) {
 
     // Run the tests
     for (i = 0; i < last; i += 1) {
-        this.log('Calling Action #' + i + ':', actions[i].action, 'with', actions[i].args);
+        this.log(`Calling Action #${i}/${last}: ${actions[i].action} with`, actions[i].args);
         before(this.autorouter, i);
         try {
             this._invokeAutoRouterMethodUnsafe(actions[i].action, actions[i].args);
@@ -178,14 +178,14 @@ AutoRouterReplayer.prototype._callNext = function () {
 AutoRouterReplayer.prototype.getPathPoints = function (pathId, callback) {
     if (this.usingWebWorker) {  // Enable web worker
         this._worker.onmessage = function(data) {
-            if (data.data[0] === 'getPathPoints' && pathId === data.data[1][0]) {
+            console.log('received data:', data);
+            if (data.data[0] === 'path' && pathId === data.data[1].id) {
                 callback(data.data[2]);
             }
         };
-        this._worker.postMessage(['getPathPoints', [pathId]]);
+        this._worker.postMessage(['path', [pathId]]);
     } else {
-        var id = this._autorouterPaths[pathId];
-        callback(this.autorouter.getPathPoints(id));
+        callback(this.autorouter.path(pathId).points);
     }
 };
 
@@ -198,7 +198,7 @@ AutoRouterReplayer.prototype.getBoxRect = function (boxId, callback) {
         };
         this._worker.postMessage(['getBoxRect', [boxId]]);
     } else {
-        var rect = this._autorouterBoxes[boxId].box.rect;
+        var rect = this.autorouter.box(boxId);
         callback(rect);
     }
 };

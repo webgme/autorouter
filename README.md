@@ -1,8 +1,9 @@
 # Autorouter
-The autorouter provides intelligent routing for connections on box diagrams.
+The autorouter provides intelligent Manhatten routing for connections on box diagrams.
 
 ## API
 + clear
++ moveBox(id, x, y)
 + setBox(id, rect)  // To create/resize/move
     + setBox('myBox', {x1, x2, y1, y2})  // resize
     + setBox(id, null)  // To remove
