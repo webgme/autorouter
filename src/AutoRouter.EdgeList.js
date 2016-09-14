@@ -243,7 +243,51 @@ AutoRouterEdgeList.prototype.addPortEdges = function (port) {
     }
 };
 
-AutoRouterEdgeList.prototype.addEdges = function (path) {
+AutoRouterEdgeList.prototype.addBoxEdges = function (box) {
+    var selfPoints = box.selfPoints,
+        startpoint,
+        startpointPrev,
+        endpoint,
+        endpointNext,
+        edge,
+        dir;
+
+    assert(box.owner === this.owner,
+        'AREdgeList.addEdges: box.owner === (owner) FAILED!');
+
+    for (var i = 0; i < 4; i++) {
+        startpointPrev = selfPoints[(i + 3) % 4];
+        startpoint = selfPoints[i];
+        endpoint = selfPoints[(i + 1) % 4];
+        endpointNext = selfPoints[(i + 2) % 4];
+        dir = Utils.getDir(endpoint.minus(startpoint));
+
+        assert(Utils.isRightAngle(dir),
+            'AREdgeList.addEdges: Utils.isRightAngle (dir) FAILED!');
+
+        if (Utils.isHorizontal(dir) === this.ishorizontal) {
+            edge = new AutoRouterEdge();
+
+            edge.owner = box;
+            edge.setStartAndEndPoint(startpoint, endpoint);
+            edge.startpointPrev = startpointPrev;
+            edge.endpointNext = endpointNext;
+
+            edge.edgeFixed = true;
+
+            this._positionLoadY(edge);
+            this._positionLoadB(edge);
+
+            if (edge.bracketClosing) {
+                edge.addToPosition(0.999);
+            }
+
+            this.insert(edge);
+        }
+    }
+};
+
+AutoRouterEdgeList.prototype.addGraphEdges = function (graph) {
     var selfPoints,
         startpoint,
         startpointPrev,
@@ -253,78 +297,35 @@ AutoRouterEdgeList.prototype.addEdges = function (path) {
         dir,
         i;
 
-    if (path instanceof AutoRouterBox) {
-        var box = path;
+    assert(graph === this.owner,
+        'AREdgeList.addEdges: graph === this.owner FAILED!');
 
-        assert(box.owner === this.owner,
-            'AREdgeList.addEdges: box.owner === (owner) FAILED!');
+    selfPoints = graph.selfPoints;
 
+    for (i = 0; i < 4; i++) {
 
-        selfPoints = box.selfPoints;
+        startpointPrev = selfPoints[(i + 3) % 4];
+        startpoint = selfPoints[i];
+        endpoint = selfPoints[(i + 1) % 4];
+        endpointNext = selfPoints[(i + 2) % 4];
+        dir = Utils.getDir(endpoint.minus(startpoint));
 
-        for (i = 0; i < 4; i++) {
-            startpointPrev = selfPoints[(i + 3) % 4];
-            startpoint = selfPoints[i];
-            endpoint = selfPoints[(i + 1) % 4];
-            endpointNext = selfPoints[(i + 2) % 4];
-            dir = Utils.getDir(endpoint.minus(startpoint));
+        assert(Utils.isRightAngle(dir),
+            'AREdgeList.addEdges: Utils.isRightAngle (dir) FAILED!');
 
-            assert(Utils.isRightAngle(dir),
-                'AREdgeList.addEdges: Utils.isRightAngle (dir) FAILED!');
+        if (Utils.isHorizontal(dir) === this.ishorizontal) {
+            edge = new AutoRouterEdge();
 
-            if (Utils.isHorizontal(dir) === this.ishorizontal) {
-                edge = new AutoRouterEdge();
+            edge.owner = graph;
+            edge.setStartAndEndPoint(startpoint, endpoint);
+            edge.startpointPrev = startpointPrev;
+            edge.endpointNext = endpointNext;
 
-                edge.owner = box;
-                edge.setStartAndEndPoint(startpoint, endpoint);
-                edge.startpointPrev = startpointPrev;
-                edge.endpointNext = endpointNext;
+            edge.edgeFixed = true;
 
-                edge.edgeFixed = true;
-
-                this._positionLoadY(edge);
-                this._positionLoadB(edge);
-
-                if (edge.bracketClosing) {
-                    edge.addToPosition(0.999);
-                }
-
-                this.insert(edge);
-            }
+            this._positionLoadY(edge);
+            this.insert(edge);
         }
-    } else if (path) {  // path is an ARGraph
-        var graph = path;
-        assert(graph === this.owner,
-            'AREdgeList.addEdges: graph === this.owner FAILED!');
-
-        selfPoints = graph.selfPoints;
-
-        for (i = 0; i < 4; i++) {
-
-            startpointPrev = selfPoints[(i + 3) % 4];
-            startpoint = selfPoints[i];
-            endpoint = selfPoints[(i + 1) % 4];
-            endpointNext = selfPoints[(i + 2) % 4];
-            dir = Utils.getDir(endpoint.minus(startpoint));
-
-            assert(Utils.isRightAngle(dir),
-                'AREdgeList.addEdges: Utils.isRightAngle (dir) FAILED!');
-
-            if (Utils.isHorizontal(dir) === this.ishorizontal) {
-                edge = new AutoRouterEdge();
-
-                edge.owner = graph;
-                edge.setStartAndEndPoint(startpoint, endpoint);
-                edge.startpointPrev = startpointPrev;
-                edge.endpointNext = endpointNext;
-
-                edge.edgeFixed = true;
-
-                this._positionLoadY(edge);
-                this.insert(edge);
-            }
-        }
-
     }
 };
 

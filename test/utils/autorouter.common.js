@@ -29,7 +29,7 @@ var connectAll = function (boxes) {
 
     for (i = boxes.length; i--;) {
         for (j = boxes.length; j--;) {
-            router.addPath({src: boxes[i].ports, dst: boxes[j].ports});
+            router.setPath(getId('path'), boxes[i], boxes[j]);
         }
     }
 
@@ -81,7 +81,7 @@ var addBoxes = function (locations) {
         i;
 
     for (i = locations.length; i--;) {
-        boxes.push(addBox({
+        boxes.unshift(addBox({
             x: locations[i][0],
             y: locations[i][1]
         }));
@@ -91,7 +91,7 @@ var addBoxes = function (locations) {
 };
 
 var getBoxCount = function () {
-    return Object.keys(router.graph.boxes).length;
+    return Object.keys(router._graph.boxes).length;
 };
 
 // Validation Helpers

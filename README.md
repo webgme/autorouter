@@ -10,6 +10,8 @@ The autorouter provides intelligent Manhatten routing for connections on box dia
 
     + return the new box or null (if removed)
 
++ setDependentBox(parentId, childId)  // To make the child move/delete w/ parent
+
 + setPort(boxId, portId, area)
     + setPort('box-10', 'north', {x1, y1, x2, y2})  // Create/update
     + setPort('box-10', 'north', null)  // removal

@@ -883,19 +883,20 @@ AutoRouterGraph.prototype._disconnectPathsFrom = function (obj) {
 };
 
 AutoRouterGraph.prototype._addSelfEdges = function () {
-    this.horizontal.addEdges(this);
-    this.vertical.addEdges(this);
+    this.horizontal.addGraphEdges(this);
+    this.vertical.addGraphEdges(this);
 };
 
-AutoRouterGraph.prototype._addEdges = function (obj) {
-    assert(!(obj instanceof AutoRouterPath), 'No Paths should be here!');
-    if (obj instanceof AutoRouterPort) {
-        this.horizontal.addPortEdges(obj);
-        this.vertical.addPortEdges(obj);
-    } else {
-        this.horizontal.addEdges(obj);
-        this.vertical.addEdges(obj);
-    }
+AutoRouterGraph.prototype._addBoxEdges = function (box) {
+    assert(box instanceof AutoRouterBox);
+    this.horizontal.addBoxEdges(box);
+    this.vertical.addBoxEdges(box);
+};
+
+AutoRouterGraph.prototype._addPortEdges = function (port) {
+    assert(port instanceof AutoRouterPort);
+    this.horizontal.addPortEdges(port);
+    this.vertical.addPortEdges(port);
 };
 
 AutoRouterGraph.prototype.deleteEdges = function (object) {
@@ -928,10 +929,10 @@ AutoRouterGraph.prototype._deleteAllEdges = function () {
 AutoRouterGraph.prototype._addBoxAndPortEdges = function (box) {
     assert(box !== null, 'ARGraph.addBoxAndPortEdges: box !== null FAILED');
 
-    this._addEdges(box);
+    this._addBoxEdges(box);
 
     for (var i = box.ports.length; i--;) {
-        this._addEdges(box.ports[i]);
+        this._addPortEdges(box.ports[i]);
     }
 
     // Add to bufferboxes

@@ -73,7 +73,7 @@ AutoRouterBox.prototype.addPort = function (port) {
     this.ports.push(port);
 
     if (this.owner) {  // Not pointing to the ARGraph
-        this.owner._addEdges(port);
+        this.owner._addPortEdges(port);
     }
 };
 

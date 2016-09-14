@@ -60,6 +60,8 @@ AutoRouter.prototype.setBox = function(id, rect) {
     } else {
         this._updateBox(id, rect);
     }
+
+    return this.box(id);
 };
 
 AutoRouter.prototype.setDependentBox = function(parentId, childId) {
@@ -78,9 +80,9 @@ AutoRouter.prototype.moveBox = function(id, x, y) {
 
     if (box) {
         rect = box.rect;
-        dx = rect.left - x;
-        dy = rect.ceil - y;
-        this._graph.shiftBoxBy(box, dx, dy);
+        dx = x - rect.left;
+        dy = y - rect.ceil;
+        this._graph.shiftBoxBy(box, {cx: dx, cy: dy});
     } else {
         throw Error(`AutoRouter: Cannot find box ${id}" to move!`);
     }
@@ -203,7 +205,7 @@ AutoRouter.prototype._box = function (id) {
 };
 
 AutoRouter.prototype._port = function (boxId, id) {
-    assert(boxId !== undefined && id !== undefined, 'Missing ' + (boxId ? 'boxId' : 'id'));
+    assert(boxId !== undefined && id !== undefined, 'Missing ' + (!boxId ? 'boxId' : 'id'));
     return this._portIds[boxId][id];
 };
 
@@ -281,7 +283,7 @@ AutoRouter.prototype._removeBox = function (id) {  // public id
 // Paths
 
 AutoRouter.prototype._createPath = function (id, srcId, dstId) {  // public id
-    var srcPorts = this._getPortsFor(srcId),
+    var srcPorts = this._getPortsFor(srcId),  // FIXME: should be able to specify ports
         dstPorts = this._getPortsFor(dstId),
         ports = srcPorts.concat(dstPorts),
         path;
